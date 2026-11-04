@@ -101,7 +101,7 @@ class MaxHeap: #Max-Heap sắp xếp các tầng dừng chiều XUỐNG theo th�
         return max_value
 
     def contains(self, value):
-        return val in self._data
+        return value in self._data
 
     def copy(self):
         h = MaxHeap()
