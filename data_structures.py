@@ -1,95 +1,106 @@
-class MinHeap:
-    """Min-Heap sắp xếp các tầng dừng chiều LÊN theo thứ tự tăng dần."""
+class MinHeap: #Min-Heap sắp xếp các tầng dừng chiều lên theo thứ tự tăng dần.
+    
     def __init__(self):
         self._data = []
 
-    def insert(self, val):
-        self._data.append(val)
+    def is_empty(self):
+        return len(self._data) == 0
+    
+    def _heapify_up(self, index):
+            parent_index = (index - 1) // 2
+            while index > 0 and self._data[index] < self._data[parent_index]:
+                self._data[index], self._data[parent_index] = self._data[parent_index], self._data[index]
+                index = parent_index
+                parent_index = (index - 1) // 2
+                
+    def insert(self, value):
+        self._data.append(value)
         self._heapify_up(len(self._data) - 1)
 
+    def _heapify_down(self, index):
+            size = len(self._data)
+            while True:
+                smallest = index
+                left = 2 * index + 1
+                right = 2 * index + 2
+
+                if left < size and self._data[left] < self._data[smallest]:
+                    smallest = left
+                if right < size and self._data[right] < self._data[smallest]:
+                    smallest = right
+
+                if smallest != index:
+                    self._data[index], self._data[smallest] = self._data[smallest], self._data[index]
+                    index = smallest
+                else:
+                    break
+                
     def extract_min(self):
         if self.is_empty():
             raise IndexError("extract_min from empty heap")
-        min_val = self._data[0]
-        last_val = self._data.pop()
-        if self._data:
-            self._data[0] = last_val
+        min_value = self._data[0]
+        last_value = self._data.pop()
+        if not self.is_empty():
+            self._data[0] = last_value
             self._heapify_down(0)
-        return min_val
+        return min_value
 
-    def peek(self):
-        if self.is_empty():
-            raise IndexError("peek from empty heap")
-        return self._data[0]
-
-    def is_empty(self):
-        return len(self._data) == 0
-
-    def contains(self, val):
-        return val in self._data
+    def contains(self, value):
+        return value in self._data
 
     def copy(self):
         h = MinHeap()
         h._data = list(self._data)
         return h
 
-    def __len__(self):
-        return len(self._data)
 
-    def _heapify_up(self, idx):
-        parent = (idx - 1) // 2
-        while idx > 0 and self._data[idx] < self._data[parent]:
-            self._data[idx], self._data[parent] = self._data[parent], self._data[idx]
-            idx = parent
-            parent = (idx - 1) // 2
-
-    def _heapify_down(self, idx):
-        size = len(self._data)
-        while True:
-            smallest = idx
-            left = 2 * idx + 1
-            right = 2 * idx + 2
-
-            if left < size and self._data[left] < self._data[smallest]:
-                smallest = left
-            if right < size and self._data[right] < self._data[smallest]:
-                smallest = right
-
-            if smallest != idx:
-                self._data[idx], self._data[smallest] = self._data[smallest], self._data[idx]
-                idx = smallest
-            else:
-                break
-
-
-class MaxHeap:
-    """Max-Heap sắp xếp các tầng dừng chiều XUỐNG theo thứ tự giảm dần."""
+class MaxHeap: #Max-Heap sắp xếp các tầng dừng chiều XUỐNG theo thứ tự giảm dần.
     def __init__(self):
         self._data = []
 
-    def insert(self, val):
-        self._data.append(val)
+    def is_empty(self):
+        return len(self._data) == 0
+    
+    def _heapify_up(self, index):
+        parent_index = (index - 1) // 2
+        while index > 0 and self._data[index] > self._data[parent_index]:
+            self._data[index], self._data[parent_index] = self._data[parent_index], self._data[index]
+            index = parent_index
+            parent_index = (index - 1) // 2    
+
+    def insert(self, value):
+        self._data.append(value)
         self._heapify_up(len(self._data) - 1)
 
+    def _heapify_down(self, index):
+        size = len(self._data)
+        while True:
+            largest = index
+            left = 2 * index + 1
+            right = 2 * index + 2
+
+            if left < size and self._data[left] > self._data[largest]:
+                largest = left
+            if right < size and self._data[right] > self._data[largest]:
+                largest = right
+
+            if largest != index:
+                self._data[index], self._data[largest] = self._data[largest], self._data[index]
+                index = largest
+            else:
+                break
+            
     def extract_max(self):
         if self.is_empty():
             raise IndexError("extract_max from empty heap")
-        max_val = self._data[0]
-        last_val = self._data.pop()
-        if self._data:
-            self._data[0] = last_val
+        max_value = self._data[0]
+        last_value = self._data.pop()
+        if not self.is_empty():
+            self._data[0] = last_value
             self._heapify_down(0)
-        return max_val
+        return max_value
 
-    def peek(self):
-        if self.is_empty():
-            raise IndexError("peek from empty heap")
-        return self._data[0]
-
-    def is_empty(self):
-        return len(self._data) == 0
-
-    def contains(self, val):
+    def contains(self, value):
         return val in self._data
 
     def copy(self):
@@ -97,40 +108,13 @@ class MaxHeap:
         h._data = list(self._data)
         return h
 
-    def __len__(self):
-        return len(self._data)
-
-    def _heapify_up(self, idx):
-        parent = (idx - 1) // 2
-        while idx > 0 and self._data[idx] > self._data[parent]:
-            self._data[idx], self._data[parent] = self._data[parent], self._data[idx]
-            idx = parent
-            parent = (idx - 1) // 2
-
-    def _heapify_down(self, idx):
-        size = len(self._data)
-        while True:
-            largest = idx
-            left = 2 * idx + 1
-            right = 2 * idx + 2
-
-            if left < size and self._data[left] > self._data[largest]:
-                largest = left
-            if right < size and self._data[right] > self._data[largest]:
-                largest = right
-
-            if largest != idx:
-                self._data[idx], self._data[largest] = self._data[largest], self._data[idx]
-                idx = largest
-            else:
-                break
-
-
-class FIFOQueue:
-    """Hàng đợi FIFO lưu yêu cầu gọi tầng ngoài sảnh."""
+class FIFOQueue: #Hàng đợi FIFO lưu yêu cầu gọi tầng ngoài sảnh.
     def __init__(self):
         self._items = []
         self._head = 0
+
+    def is_empty(self):
+        return self._head >= len(self._items)
 
     def enqueue(self, item):
         self._items.append(item)
@@ -144,14 +128,3 @@ class FIFOQueue:
             self._items = self._items[self._head:]
             self._head = 0
         return item
-
-    def peek(self):
-        if self.is_empty():
-            raise IndexError("peek from empty queue")
-        return self._items[self._head]
-
-    def is_empty(self):
-        return self._head >= len(self._items)
-
-    def __len__(self):
-        return len(self._items) - self._head
