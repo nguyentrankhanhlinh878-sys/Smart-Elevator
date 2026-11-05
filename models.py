@@ -1,21 +1,18 @@
 from data_structures import MinHeap, MaxHeap
 
-class ExternalRequest:
-    """Yêu cầu gọi thang từ ngoài sảnh gồm số tầng và hướng đi ('UP' hoặc 'DOWN')."""
+class ExternalRequest:#Yêu cầu gọi thang từ ngoài sảnh ('UP' hoặc 'DOWN').
     def __init__(self, floor, direction):
         self.floor = floor
         self.direction = direction
 
 
-class CabinRequest:
-    """Yêu cầu bấm chọn tầng từ bên trong khoang thang máy."""
+class CabinRequest:#Yêu cầu bấm chọn tầng từ bên trong cabin.
     def __init__(self, elevator_id, target_floor):
         self.elevator_id = elevator_id
         self.target_floor = target_floor
 
 
 class Elevator:
-    """Mô hình thang máy sử dụng 2 Heap (MinHeap và MaxHeap) theo thuật toán LOOK."""
     def __init__(self, elevator_id, initial_floor, initial_dest=None):
         self.id = elevator_id
         self.initial_floor = initial_floor
@@ -24,7 +21,6 @@ class Elevator:
 
         self.up_queue = MinHeap()
         self.down_queue = MaxHeap()
-        self.planned_stops = set()
 
         if initial_dest is not None and initial_dest != initial_floor:
             if initial_dest > initial_floor:
@@ -33,7 +29,6 @@ class Elevator:
             else:
                 self.state = "MOVING_DOWN"
                 self.down_queue.insert(initial_dest)
-            self.planned_stops.add(initial_dest)
         else:
             self.state = "IDLE"
 
@@ -72,7 +67,6 @@ class Elevator:
                 added = True
 
         if added:
-            self.planned_stops.add(floor)
             if self.state == "IDLE":
                 if floor > self.current_floor:
                     self.state = "MOVING_UP"
@@ -84,12 +78,11 @@ class Elevator:
         return added
 
     def has_movement(self):
-        return len(self.planned_stops) > 0
+        return not self.up_queue.is_empty() or not self.down_queue.is_empty()
 
     def finish_route(self):
         self.up_queue = MinHeap()
         self.down_queue = MaxHeap()
-        self.planned_stops.clear()
         self.initial_dest = None
         self.state = "IDLE"
 
