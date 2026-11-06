@@ -32,17 +32,16 @@ class Elevator:
         else:
             self.state = "IDLE"
 
-    def add_stop(self, floor, dir_intent="NONE"):
-        """Thêm tầng dừng vào MinHeap hoặc MaxHeap tương ứng, tránh trùng lặp."""
-        if floor == self.current_floor and self.state == "IDLE" and dir_intent == "NONE":
+    def add_stop(self, floor, direction_intent="NONE"):
+        if floor == self.current_floor and self.state == "IDLE" and direction_intent == "NONE":
             return False
 
         target_up = False
         target_down = False
 
-        if dir_intent == "UP":
+        if direction_intent == "UP":
             target_up = True
-        elif dir_intent == "DOWN":
+        elif direction_intent == "DOWN":
             target_down = True
         elif floor > self.current_floor:
             target_up = True
@@ -73,7 +72,7 @@ class Elevator:
                 elif floor < self.current_floor:
                     self.state = "MOVING_DOWN"
                 else:
-                    self.state = "MOVING_UP" if dir_intent == "UP" else "MOVING_DOWN"
+                    self.state = "MOVING_UP" if direction_intent == "UP" else "MOVING_DOWN"
 
         return added
 
