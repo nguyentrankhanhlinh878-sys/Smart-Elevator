@@ -87,7 +87,8 @@ class Elevator:
 
     def complete_route(self):
         route = self.generate_route()
-        self.current_floor = route[-1]
+        for floor in route[1:]:
+            self.current_floor = floor
         self.finish_route()
         return route
 
