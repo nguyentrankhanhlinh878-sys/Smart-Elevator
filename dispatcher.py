@@ -1,11 +1,7 @@
 class GroupDispatcher:
-    """Bộ điều phối trung tâm cho 10 thang máy trong tòa nhà 12 tầng."""
     def __init__(self, elevators, total_floors=12):
         self.elevators = elevators
         self.total_floors = total_floors
-
-    def get_elevator(self, elevator_id):
-        return self.elevators[elevator_id - 1]
 
     def calculate_cost(self, elevator, req):
         """Tính chi phí để chọn thang máy tối ưu nhất cho yêu cầu ngoài sảnh."""
@@ -49,7 +45,7 @@ class GroupDispatcher:
         return best_elevator, min_cost
 
     def process_cabin(self, req):
-        elevator = self.get_elevator(req.elevator_id)
+        elevator = self.elevators[req.elevator_id - 1]
         return elevator.add_stop(req.target_floor)
 
     def run_dispatch(self, external_queue, cabin_requests, down_queue=None):
