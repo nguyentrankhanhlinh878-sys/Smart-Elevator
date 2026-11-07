@@ -3,20 +3,19 @@ class GroupDispatcher:
         self.elevators = elevators
         self.total_floors = total_floors
 
-    def calculate_cost(self, elevator, req):
-        """Tính chi phí để chọn thang máy tối ưu nhất cho yêu cầu ngoài sảnh."""
-        distance = abs(elevator.current_floor - req.floor)
+    def calculate_cost(self, elevator, request):
+        distance = abs(elevator.current_floor - request.floor)
         idle_penalty = self.total_floors
         opposite_direction_penalty = 2 * self.total_floors
 
         moving_toward_request = (
             elevator.state == "MOVING_UP"
-            and req.direction == "UP"
-            and elevator.current_floor <= req.floor
+            and request.direction == "UP"
+            and elevator.current_floor <= request.floor
         ) or (
             elevator.state == "MOVING_DOWN"
-            and req.direction == "DOWN"
-            and elevator.current_floor >= req.floor
+            and request.direction == "DOWN"
+            and elevator.current_floor >= request.floor
         )
 
         # Ưu tiên 1: Thang đang đi cùng chiều và chưa vượt qua tầng gọi
