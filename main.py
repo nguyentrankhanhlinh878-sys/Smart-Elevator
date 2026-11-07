@@ -156,7 +156,7 @@ def run_simulator():
         while True:
             try:
                 print("\n[BƯỚC 3] Nhập yêu cầu chọn tầng bên trong thang máy (ví dụ: 1:12 3:1 4:1):")
-                print("Định dạng: <tầng_hiện_tại>:<tầng_đích>")
+                print("Định dạng: <mã_thang_máy>:<tầng_đích>")
                 print("Ví dụ: 1:12 3:1 4:1")
                 cabin_line = input("Chọn tầng> ")
                 cabin_requests = parse_cabin_requests(cabin_line)
