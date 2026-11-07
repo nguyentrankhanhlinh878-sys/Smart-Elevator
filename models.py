@@ -84,11 +84,6 @@ class Elevator:
         if not self.has_movement():
             return route
 
-        if self.state not in ("MOVING_UP", "MOVING_DOWN"):
-            raise RuntimeError("Cannot generate a route with queued stops while the elevator is idle")
-
-        curr = self.current_floor
-
         up_stops = []
         while not self.up_queue.is_empty():
             up_stops.append(self.up_queue.extract_min())
@@ -98,14 +93,14 @@ class Elevator:
             down_stops.append(self.down_queue.extract_max())
 
         if self.state == "MOVING_UP":
-            phase1 = [f for f in up_stops if f >= curr]
+            phase1 = [f for f in up_stops if f >= self.current_floor]
             phase2 = down_stops
-            phase3 = [f for f in up_stops if f < curr]
+            phase3 = [f for f in up_stops if f < self.current_floor]
             all_stops = phase1 + phase2 + phase3
         elif self.state == "MOVING_DOWN":
-            phase1 = [f for f in down_stops if f <= curr]
+            phase1 = [f for f in down_stops if f <= self.current_floor]
             phase2 = up_stops
-            phase3 = [f for f in down_stops if f > curr]
+            phase3 = [f for f in down_stops if f > self.current_floor]
             all_stops = phase1 + phase2 + phase3
 
         for stop in all_stops:
