@@ -1,12 +1,12 @@
 from data_structures import MinHeap, MaxHeap
 
-class ExternalRequest:#Yêu cầu gọi thang từ ngoài sảnh ('UP' hoặc 'DOWN').
+class ExternalRequest:
     def __init__(self, floor, direction):
         self.floor = floor
         self.direction = direction
 
 
-class CabinRequest:#Yêu cầu bấm chọn tầng từ bên trong cabin.
+class CabinRequest:
     def __init__(self, elevator_id, target_floor):
         self.elevator_id = elevator_id
         self.target_floor = target_floor
@@ -79,54 +79,30 @@ class Elevator:
     def has_movement(self):
         return not self.up_queue.is_empty() or not self.down_queue.is_empty()
 
-    def finish_route(self):
-        self.up_queue = MinHeap()
-        self.down_queue = MaxHeap()
-        self.initial_dest = None
-        self.state = "IDLE"
-
-    def complete_route(self):
-        route = self.generate_route()
-        for floor in route[1:]:
-            self.current_floor = floor
-        self.finish_route()
-        return route
-
     def generate_route(self):
-        """Tạo lộ trình di chuyển 3 pha theo thuật toán LOOK."""
         route = [self.current_floor]
         if not self.has_movement():
             return route
 
+        if self.state not in ("MOVING_UP", "MOVING_DOWN"):
+            raise RuntimeError("Cannot generate a route with queued stops while the elevator is idle")
+
         curr = self.current_floor
-        up_copy = self.up_queue.copy()
-        down_copy = self.down_queue.copy()
 
         up_stops = []
-        while not up_copy.is_empty():
-            up_stops.append(up_copy.extract_min())
+        while not self.up_queue.is_empty():
+            up_stops.append(self.up_queue.extract_min())
 
         down_stops = []
-        while not down_copy.is_empty():
-            down_stops.append(down_copy.extract_max())
+        while not self.down_queue.is_empty():
+            down_stops.append(self.down_queue.extract_max())
 
-        primary_dir = self.state
-        if primary_dir == "IDLE":
-            if up_stops and down_stops:
-                dist_up = min(abs(s - curr) for s in up_stops)
-                dist_down = min(abs(s - curr) for s in down_stops)
-                primary_dir = "MOVING_UP" if dist_up <= dist_down else "MOVING_DOWN"
-            elif up_stops:
-                primary_dir = "MOVING_UP"
-            else:
-                primary_dir = "MOVING_DOWN"
-
-        if primary_dir == "MOVING_UP":
+        if self.state == "MOVING_UP":
             phase1 = [f for f in up_stops if f >= curr]
             phase2 = down_stops
             phase3 = [f for f in up_stops if f < curr]
             all_stops = phase1 + phase2 + phase3
-        else:
+        elif self.state == "MOVING_DOWN":
             phase1 = [f for f in down_stops if f <= curr]
             phase2 = up_stops
             phase3 = [f for f in down_stops if f > curr]
@@ -136,4 +112,12 @@ class Elevator:
             if stop != route[-1]:
                 route.append(stop)
 
+        return route
+
+    def complete_route(self):
+        route = self.generate_route()
+        for floor in route[1:]:
+            self.current_floor = floor
+        self.initial_dest = None
+        self.state = "IDLE"
         return route
