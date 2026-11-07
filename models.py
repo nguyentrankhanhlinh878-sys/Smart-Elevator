@@ -5,12 +5,10 @@ class ExternalRequest:
         self.floor = floor
         self.direction = direction
 
-
 class CabinRequest:
     def __init__(self, elevator_id, target_floor):
         self.elevator_id = elevator_id
         self.target_floor = target_floor
-
 
 class Elevator:
     def __init__(self, elevator_id, initial_floor, initial_dest=None):
