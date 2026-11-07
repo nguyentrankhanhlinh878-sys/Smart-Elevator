@@ -14,79 +14,75 @@ def parse_integer(value, description):
 
 
 def parse_elevators_input(line):
-    """Đọc trạng thái ban đầu của 10 thang máy (Ví dụ: '1 3 5:10 8:2 4 6 7 9 11 12')."""
-    tokens = line.strip().split()
-    if len(tokens) != TOTAL_ELEVATORS:
-        raise ValueError(f"Cần nhập đúng {TOTAL_ELEVATORS} trạng thái thang máy, hiện có {len(tokens)}.")
+    elevator_input = line.split()
+    if len(elevator_input) != TOTAL_ELEVATORS:
+        raise ValueError(f"Cần nhập đúng {TOTAL_ELEVATORS} trạng thái thang máy, hiện có {len(elevator_input)}.")
 
     elevators = []
-    for idx, token in enumerate(tokens, start=1):
-        if ":" in token:
-            parts = token.split(":")
+    for elevator_id, elevator_status in enumerate(elevator_input, start=1):
+        if ":" in elevator_status:
+            parts = elevator_status.split(":")
             if len(parts) != 2:
-                raise ValueError(f"Định dạng '{token}' của thang #{idx} không hợp lệ. Cần nhập <tầng>:<tầng_đích>.")
-            init_floor = parse_integer(parts[0], f"Tầng hiện tại của thang #{idx}")
-            dest_floor = parse_integer(parts[1], f"Tầng đích của thang #{idx}")
+                raise ValueError(f"Định dạng '{elevator_status}' của thang #{elevator_id} không hợp lệ. Cần nhập <tầng>:<tầng_đích>.")
+            init_floor = parse_integer(parts[0], f"Tầng hiện tại của thang #{elevator_id}")
+            dest_floor = parse_integer(parts[1], f"Tầng đích của thang #{elevator_id}")
             if not (1 <= init_floor <= TOTAL_FLOORS) or not (1 <= dest_floor <= TOTAL_FLOORS):
-                raise ValueError(f"Tầng của thang #{idx} phải nằm trong khoảng [1..{TOTAL_FLOORS}].")
+                raise ValueError(f"Tầng của thang #{elevator_id} phải nằm trong khoảng [1 -> {TOTAL_FLOORS}].")
             if init_floor == dest_floor:
-                raise ValueError(f"Tầng đích của thang #{idx} không thể trùng tầng hiện tại.")
-            elevators.append(Elevator(idx, init_floor, dest_floor))
+                raise ValueError(f"Tầng đích của thang #{elevator_id} không thể trùng tầng hiện tại.")
+            elevators.append(Elevator(elevator_id, init_floor, dest_floor))
         else:
-            init_floor = parse_integer(token, f"Tầng hiện tại của thang #{idx}")
+            init_floor = parse_integer(elevator_status, f"Tầng hiện tại của thang #{elevator_id}")
             if not (1 <= init_floor <= TOTAL_FLOORS):
-                raise ValueError(f"Tầng của thang #{idx} phải nằm trong khoảng [1..{TOTAL_FLOORS}].")
-            elevators.append(Elevator(idx, init_floor, None))
+                raise ValueError(f"Tầng của thang #{elevator_id} phải nằm trong khoảng [1 -> {TOTAL_FLOORS}].")
+            elevators.append(Elevator(elevator_id, init_floor, None))
 
     return elevators
 
 
 def parse_external_requests(line):
-    """Đọc yêu cầu gọi tầng ngoài sảnh không cần Regex (Ví dụ: '6U 3D 10D')."""
-    tokens = line.strip().split()
+    external_request_input = line.strip().split()
     requests = []
-    for token in tokens:
-        if len(token) < 2:
-            raise ValueError(f"Yêu cầu '{token}' không hợp lệ. Cần nhập <tầng><U|D> (ví dụ: 5U, 2D).")
-        floor_str = token[:-1]
-        dir_char = token[-1].upper()
+    for input in external_request_input:
+        if len(input) < 2:
+            raise ValueError(f"Yêu cầu '{input}' không hợp lệ. Cần nhập <tầng><U/D> (ví dụ: 5U, 2D).")
+        floor_text = input[:-1]
+        direction_char = input[-1].upper()
 
-        if not floor_str.isdigit() or dir_char not in ("U", "D"):
-            raise ValueError(f"Yêu cầu '{token}' không hợp lệ. Cần nhập <tầng><U|D> (ví dụ: 5U, 2D).")
+        if not floor_text.isdigit() or direction_char not in ("U", "D"):
+            raise ValueError(f"Yêu cầu '{input}' không hợp lệ. Cần nhập <tầng><U/D> (ví dụ: 5U, 2D).")
 
-        floor = int(floor_str)
+        floor = int(floor_text)
         if not (1 <= floor <= TOTAL_FLOORS):
-            raise ValueError(f"Tầng gọi {floor} phải nằm trong khoảng [1..{TOTAL_FLOORS}].")
-        if floor == 1 and dir_char == "D":
+            raise ValueError(f"Tầng gọi {floor} phải nằm trong khoảng [1 -> {TOTAL_FLOORS}].")
+        if floor == 1 and direction_char == "D":
             raise ValueError("Tầng 1 không thể gọi thang đi xuống.")
-        if floor == TOTAL_FLOORS and dir_char == "U":
+        if floor == TOTAL_FLOORS and direction_char == "U":
             raise ValueError(f"Tầng trên cùng {TOTAL_FLOORS} không thể gọi thang đi lên.")
 
-        direction = "UP" if dir_char == "U" else "DOWN"
+        direction = "UP" if direction_char == "U" else "DOWN"
         requests.append(ExternalRequest(floor, direction))
     return requests
 
 
 def parse_cabin_requests(line):
-    """Đọc yêu cầu chọn tầng trong cabin (Ví dụ: '1:10 3:1')."""
-    tokens = line.strip().split()
+    cabin_requests_input = line.strip().split()
     requests = []
-    for token in tokens:
-        parts = token.split(":")
+    for input in cabin_requests_input:
+        parts = input.split(":")
         if len(parts) != 2:
-            raise ValueError(f"Yêu cầu trong cabin '{token}' không hợp lệ. Cần nhập <mã_thang>:<tầng_đích>.")
-        elev_id = parse_integer(parts[0], "Mã thang máy")
+            raise ValueError(f"Yêu cầu trong cabin '{input}' không hợp lệ. Cần nhập <mã_thang>:<tầng_đích>.")
+        elevator_id = parse_integer(parts[0], "Mã thang máy")
         target_floor = parse_integer(parts[1], "Tầng đích")
-        if not (1 <= elev_id <= TOTAL_ELEVATORS):
-            raise ValueError(f"Mã thang máy {elev_id} phải nằm trong khoảng [1..{TOTAL_ELEVATORS}].")
+        if not (1 <= elevator_id <= TOTAL_ELEVATORS):
+            raise ValueError(f"Mã thang máy {elevator_id} phải nằm trong khoảng [1..{TOTAL_ELEVATORS}].")
         if not (1 <= target_floor <= TOTAL_FLOORS):
             raise ValueError(f"Tầng đích {target_floor} phải nằm trong khoảng [1..{TOTAL_FLOORS}].")
-        requests.append(CabinRequest(elev_id, target_floor))
+        requests.append(CabinRequest(elevator_id, target_floor))
     return requests
 
 
 def display_results(elevators, logs, routes):
-    """In nhật ký điều phối và bảng lộ trình di chuyển bằng lệnh print cơ bản."""
     print("\n" + "=" * 70)
     print("NHẬT KÝ ĐIỀU PHỐI")
     print("=" * 70)
@@ -128,18 +124,18 @@ def read_initial_elevators():
             print("[BƯỚC 1] Nhập trạng thái ban đầu của 10 thang máy (cách nhau bằng dấu cách):")
             print("Định dạng: <tầng> nếu đứng yên, hoặc <tầng>:<tầng_đích> nếu đang di chuyển")
             print("Ví dụ: 1 3 5:10 8:2 4 6 7 9 11 12")
-            elev_line = input("Thang máy> ").strip()
-            if not elev_line:
-                elev_line = "1 3 5:10 8:2 4 6 7 9 11 12"
-                print(f">> Tự động sử dụng cấu hình mặc định: {elev_line}")
-            return parse_elevators_input(elev_line)
+            elevator_line = input("Thang máy> ").strip()
+            if not elevator_line:
+                elevator_line = "1 3 5:10 8:2 4 6 7 9 11 12"
+                print(f">> Tự động sử dụng cấu hình mặc định: {elevator_line}")
+            return parse_elevators_input(elevator_line)
         except ValueError as e:
             print(f">> Lỗi: {e} Vui lòng nhập lại.\n")
 
 
 def run_simulator():
     print("=" * 70)
-    print("MÔ PHỎNG ĐIỀU PHỐI THANG MÁY THÔNG MINH (CSD203 - FA26)")
+    print("MÔ PHỎNG ĐIỀU PHỐI THANG MÁY THÔNG MINH (CSD203 - FA26 - GROUP06)")
     print("12 tầng (1-12) | 10 khoang thang máy")
     print("=" * 70)
 
@@ -148,9 +144,11 @@ def run_simulator():
     while True:
         while True:
             try:
-                print("\n[BƯỚC 2] Nhập yêu cầu gọi thang từ bên ngoài (ví dụ: 6U 3D 10D 6D):")
-                ext_line = input("Gọi tầng> ")
-                external_requests = parse_external_requests(ext_line)
+                print("\n[BƯỚC 2] Nhập yêu cầu gọi thang từ bên ngoài :")
+                print("Định dạng: <tầng><U/D> (U = LÊN, D = XUỐNG)")
+                print("Ví dụ: 5U 2D 8U 3D")
+                external_line = input("Gọi tầng> ")
+                external_requests = parse_external_requests(external_line)
                 break
             except ValueError as e:
                 print(f">> Lỗi: {e} Vui lòng nhập lại.")
@@ -158,23 +156,24 @@ def run_simulator():
         while True:
             try:
                 print("\n[BƯỚC 3] Nhập yêu cầu chọn tầng bên trong thang máy (ví dụ: 1:12 3:1 4:1):")
-                cab_line = input("Chọn tầng> ")
-                cabin_requests = parse_cabin_requests(cab_line)
+                print("Định dạng: <tầng_hiện_tại>:<tầng_đích>")
+                print("Ví dụ: 1:12 3:1 4:1")
+                cabin_line = input("Chọn tầng> ")
+                cabin_requests = parse_cabin_requests(cabin_line)
                 break
             except ValueError as e:
                 print(f">> Lỗi: {e} Vui lòng nhập lại.")
 
-        # Đưa yêu cầu vào 2 hàng đợi FIFO tách biệt theo hướng LÊN và XUỐNG
         up_external_queue = FIFOQueue()
         down_external_queue = FIFOQueue()
-        for req in external_requests:
-            if req.direction == "UP":
-                up_external_queue.enqueue(req)
+        for request in external_requests:
+            if request.direction == "UP":
+                up_external_queue.enqueue(request)
             else:
-                down_external_queue.enqueue(req)
+                down_external_queue.enqueue(request)
 
         dispatcher = GroupDispatcher(elevators, total_floors=TOTAL_FLOORS)
-        logs = dispatcher.run_dispatch(up_external_queue, cabin_requests, down_queue=down_external_queue)
+        logs = dispatcher.run_dispatch(up_external_queue, cabin_requests, down_external_queue=down_external_queue)
 
         routes = {}
         for elevator in elevators:
