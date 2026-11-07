@@ -48,12 +48,6 @@ class MinHeap:
     def contains(self, value):
         return value in self._data
 
-    def copy(self):
-        h = MinHeap()
-        h._data = list(self._data)
-        return h
-
-
 class MaxHeap: 
     def __init__(self):
         self._data = []
@@ -102,11 +96,6 @@ class MaxHeap:
 
     def contains(self, value):
         return value in self._data
-
-    def copy(self):
-        h = MaxHeap()
-        h._data = list(self._data)
-        return h
 
 class FIFOQueue:
     def __init__(self):
