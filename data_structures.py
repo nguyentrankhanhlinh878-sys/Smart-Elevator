@@ -1,4 +1,4 @@
-class MinHeap: #Min-Heap sắp xếp các tầng dừng chiều lên theo thứ tự tăng dần.
+class MinHeap: 
     
     def __init__(self):
         self._data = []
@@ -54,7 +54,7 @@ class MinHeap: #Min-Heap sắp xếp các tầng dừng chiều lên theo thứ 
         return h
 
 
-class MaxHeap: #Max-Heap sắp xếp các tầng dừng chiều XUỐNG theo thứ tự giảm dần.
+class MaxHeap: 
     def __init__(self):
         self._data = []
 
@@ -108,7 +108,7 @@ class MaxHeap: #Max-Heap sắp xếp các tầng dừng chiều XUỐNG theo th�
         h._data = list(self._data)
         return h
 
-class FIFOQueue: #Hàng đợi FIFO lưu yêu cầu gọi tầng ngoài sảnh.
+class FIFOQueue:
     def __init__(self):
         self._items = []
         self._head = 0
